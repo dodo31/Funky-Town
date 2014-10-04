@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 public class ConstructeurBatiments {
 
@@ -11,34 +12,35 @@ public class ConstructeurBatiments {
 		final int COEFF_DIFF_TAILLE = Grille.TAILLE_CUBE_BAT / Grille.TAILLE_CUBE_ROUTE;
 		Batiment nouveauBatiment = null;
 		long repereTempo = (long) (System.nanoTime()/1000000000F);
+		Random facteurHauteur = new Random();
 		for (Iterator<Route> itRoutes = Grille.getRoutes().iterator(); itRoutes.hasNext();) {
 			Route route = itRoutes.next();
-			int indexRouteHoriz = indexPremiereRouteHoriz();
 			try{
 				if(route.getAlignement() == "N-S"){
-					int enumY = 0;
-					while(enumY < Grille.TAILLE_GRILLE_Y){
-						do {
-							posX1 = route.getPosX1() + route.getLargeur();
-							posY1 = Grille.getRoutes().get(indexRouteHoriz).getPosY1() / COEFF_DIFF_TAILLE;
-							enumY += posY1 + 1;
-							posX2 = posX1 + 2 /*Constructeur.trouverRoute(route, posY1, routes, true)*/;
-							if(posY1 > Grille.getRoutes().get(indexRouteHoriz + 1).getPosY1() / COEFF_DIFF_TAILLE)
-								indexRouteHoriz++;
-							posY2 = Grille.getRoutes().get(indexRouteHoriz + 1).getPosY1() / COEFF_DIFF_TAILLE - COEFF_DIFF_TAILLE;
-							posZ1 = 0;
-							posZ2 = (int) (2 + 10 * Math.random());
-							
-							nouveauBatiment = new Batiment(posX1, posX2, posY1, posY2, posZ1, posZ2, new Couleur((int) (256 * Math.random()), 255, 255));
-							
-							if(System.nanoTime()/1000000000F - repereTempo > 1)
-								throw new Exception("Échec au niveau des batiments, regénération...");
-							enumY += 1;
-						} while(!placementConforme(nouveauBatiment, route.getAlignement()));
+					for(int indexRouteHoriz = indexPremiereRouteHoriz(); indexRouteHoriz < Grille.getRoutes().size() - 1;){
+//						do {
+						
+//						if((Grille.getRoutes().get(indexRouteHoriz + 1).getPosY1() - 1) - (Grille.getRoutes().get(indexRouteHoriz).getPosY1() + Grille.getRoutes().get(indexRouteHoriz).getLargeur()) < 3)
+//							continue;
+						
+						posX1 = route.getPosX1() + route.getLargeur();
+						posY1 = Grille.getRoutes().get(indexRouteHoriz).getPosY1() + Grille.getRoutes().get(indexRouteHoriz).getLargeur(); // En cubes taille route
+						
+						posX2 = posX1 + 2 /*Constructeur.trouverRoute(route, posY1, routes, true)*/;
+						indexRouteHoriz++;
+						posY2 = Grille.getRoutes().get(indexRouteHoriz).getPosY1() - (((posY1 - Grille.getRoutes().get(indexRouteHoriz).getPosY1()) % COEFF_DIFF_TAILLE == 0) ? 1 : COEFF_DIFF_TAILLE)
+								- (Grille.getRoutes().get(indexRouteHoriz).getPosY1() - posY1)/COEFF_DIFF_TAILLE;		// En cubes taille bâtiments
+						
+						posZ1 = 1;
+						posZ2 = (int) (4 + Math.abs(5 * facteurHauteur.nextGaussian()));
+						
+						nouveauBatiment = new Batiment(posX1, posX2, posY1, posY2, posZ1, posZ2, Main.couleursPredefinies.get((int) (Math.random() * Main.couleursPredefinies.size())));
+						
+						if(System.nanoTime()/1000000000F - repereTempo > 1)
+							throw new Exception("Échec au niveau des batiments, regénération...");
+//						} while(!placementConforme(nouveauBatiment, route.getAlignement()));
 						
 						nouveauxBatiments.add(nouveauBatiment);
-						System.out.println(nouveauBatiment);
-						enumY += 3;
 					}
 				}
 			} catch (Exception e) {

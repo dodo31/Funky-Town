@@ -31,7 +31,10 @@ public class Cube implements Comparable<Object>{
 	public void afficher(){
 		p.translate(posX, posY, posZ);
 		p.fill(couleur.getTeinte(), couleur.getSaturation(), couleur.getLuminosité());
-		p.stroke(0, 10);
+		if(taille == Grille.TAILLE_CUBE_BAT)
+			p.stroke(0, 10);
+		else
+			p.noStroke();
 		p.box(taille);
 		p.translate(-posX, -posY, -posZ);
 	}

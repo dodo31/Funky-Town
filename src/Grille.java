@@ -20,8 +20,8 @@ public class Grille {
 	public final static int TAILLE_CUBE_ROUTE = 2;
 	public final static int TAILLE_CUBE_BAT = 4;
 
-	public final static int TAILLE_GRILLE_X = 200;
-	public final static int TAILLE_GRILLE_Y = 200;
+	public final static int TAILLE_GRILLE_X = 150;
+	public final static int TAILLE_GRILLE_Y = 150;
 	public final static int TAILLE_GRILLE_Z = 1;
 	public final static int DIAGONALE = (int) Math.sqrt(Math.pow(TAILLE_GRILLE_X, 2) + Math.pow(TAILLE_GRILLE_Y, 2));
 	
@@ -60,13 +60,12 @@ public class Grille {
 			Route route = itRoutes.next();
 			for (int x = Math.min(route.getPosX1(), route.getPosX2()); x <= Math.max(route.getPosX1(), route.getPosX2()); x += 1) {
 				for (int y = Math.min(route.getPosY1(), route.getPosY2()); y <= Math.max(route.getPosY1(), route.getPosY2()); y += 1) {
-					Collections.sort(cubesComposants);
+//					Collections.sort(cubesComposants);
 					int posX = posXref + x * TAILLE_CUBE_ROUTE;
 					int posY = posYref + y * TAILLE_CUBE_ROUTE;
-					if(!cubeCorrespondant(posX, posY, 0, TAILLE_CUBE_ROUTE)){
+//					if(!cubeCorrespondant(posX, posY, 0, TAILLE_CUBE_ROUTE)){
 						cubesComposants.add(new Cube(p, posX, posY, 0, TAILLE_CUBE_ROUTE, new Couleur(36, 255, 255)));
-//						cubes.getLast().setCouleur(Couleur.getHSBCouleur(route.getAlignement().equals("N-S") ? (route.getPosY2() > route.getPosY1() ? 0 : 0.59F) : (route.getPosX2() > route.getPosX1() ? 0.78F : 0.2F), 1, 1));
-					}
+//					}
 				}
 			}
 		}
@@ -75,7 +74,7 @@ public class Grille {
 	public static void genererBatiments(){
 		System.out.println("Génération des batiments...");
 		batiments.addAll(ConstructeurBatiments.batiments());
-		System.out.println("batiments générés avec succès : " + batiments.size() + " batiments.");
+		System.out.println("Batiments générés avec succès : " + batiments.size() + " batiments.");
 	}
 	public static void injecterBatiments(){		
 		System.out.println("Injection des batiments...");
@@ -85,19 +84,15 @@ public class Grille {
 			for (int x = Math.min(batiment.getPosX1(), batiment.getPosX2()); x <= Math.max(batiment.getPosX1(), batiment.getPosX2()); x += 1) {
 				for (int y = Math.min(batiment.getPosY1(), batiment.getPosY2()); y <= Math.max(batiment.getPosY1(), batiment.getPosY2()); y += 1) {
 					for (int z = 0; z <= Math.max(batiment.getPosZ1(), batiment.getPosZ2()); z += 1) {
-						Collections.sort(cubesComposants);
 						int posX = posXref + batiment.getPosX1() * TAILLE_CUBE_ROUTE + TAILLE_CUBE_ROUTE/2 + (x - batiment.getPosX1()) * TAILLE_CUBE_BAT;
 						int posY = posYref + batiment.getPosY1() * TAILLE_CUBE_ROUTE + TAILLE_CUBE_ROUTE/2 + (y - batiment.getPosY1()) * TAILLE_CUBE_BAT;
 						int posZ = posZref + batiment.getPosZ1() * TAILLE_CUBE_ROUTE + TAILLE_CUBE_ROUTE/2 + (z - batiment.getPosZ1()) * TAILLE_CUBE_BAT;
-						if(!cubeCorrespondant(posX, posY, posZ, TAILLE_CUBE_BAT)){
-							int teinte = (int) (batiment.getCouleurRef().getTeinte()/* + 6 * Math.random() - 3*/);
-							boolean allumé = (Math.random() > 0.5F);
-							int saturation = (allumé) ? 255 : 200;
-							int luminosité = (allumé) ? 255 : 50;
-							
-							cubesComposants.add(new Cube(p, posX, posY, posZ, TAILLE_CUBE_BAT, new Couleur(teinte, saturation, luminosité)));
-//							cubes.getLast().setCouleur(Couleur.getHSBCouleur(0.5F, 1, 1));
-						}
+						int teinte = (int) (batiment.getCouleurRef().getTeinte()/* + 6 * Math.random() - 3*/);
+						boolean allumé = (Math.random() > 0.2F && z != batiment.getPosZ2());
+						int saturation = (allumé) ? 255 : 200;
+						int luminosité = (allumé) ? 255 : 50;
+						
+						cubesComposants.add(new Cube(p, posX, posY, posZ, TAILLE_CUBE_BAT, new Couleur(teinte, saturation, luminosité)));
 					}
 				}
 			}
@@ -112,10 +107,6 @@ public class Grille {
 					cubes.add(new Cube(p, posXref + x * TAILLE_CUBE_ROUTE, posYref + y * TAILLE_CUBE_ROUTE, posZref + 0, TAILLE_CUBE_ROUTE, new Couleur(0, 0, 20)));
 			}
 		}
-//		for (Iterator<Cube> itCubes = cubes.iterator(); itCubes.hasNext();) {
-//			Cube cube = itCubes.next();
-//			System.out.println(cube);
-//		}
 		cubes.addAll(cubesComposants);
 		System.out.println("\n	Ville générée !\n");
 	}
@@ -129,6 +120,7 @@ public class Grille {
 	
 	public static void reinitialiser(){
 		cubes.clear();
+		cubesComposants.clear();
 		routes.clear();
 		batiments.clear();
 		
@@ -136,13 +128,19 @@ public class Grille {
 		injecterRoutes();
 		genererBatiments();
 		injecterBatiments();
+		genererSol();
+	}
+	
+	public static void gérerEclairageEtCamera() {
+		p.camera((posXref + (TAILLE_GRILLE_X * TAILLE_CUBE_ROUTE)) * zoom, (posYref + (TAILLE_GRILLE_Y * TAILLE_CUBE_ROUTE)) * zoom, 60 * zoom,
+				 posXref + (TAILLE_GRILLE_X * TAILLE_CUBE_ROUTE)/2, posYref + (TAILLE_GRILLE_Y * TAILLE_CUBE_ROUTE)/2, posZref + (TAILLE_GRILLE_Z * TAILLE_CUBE_ROUTE)/2,
+				 0F, 1F, 0F);	
+//		p.pointLight(0, 0, 255, (posXref + (TAILLE_GRILLE_X * TAILLE_CUBE_ROUTE)) * 2, (posYref + (TAILLE_GRILLE_Y * TAILLE_CUBE_ROUTE)) * 2, 60 * 2);
+		p.directionalLight((posXref + (TAILLE_GRILLE_X * TAILLE_CUBE_ROUTE)) * 2, (posYref + (TAILLE_GRILLE_Y * TAILLE_CUBE_ROUTE)) * 2, 60 * 2,
+				posXref + (TAILLE_GRILLE_X * TAILLE_CUBE_ROUTE)/2, posYref + (TAILLE_GRILLE_Y * TAILLE_CUBE_ROUTE)/2, posZref + 60);	
 	}
 	
 	public static void afficherContour(){
-		p.camera((posXref + (TAILLE_GRILLE_X * TAILLE_CUBE_ROUTE)) * zoom, (posYref + (TAILLE_GRILLE_Y * TAILLE_CUBE_ROUTE)) * zoom, 60 * zoom,
-				 posXref + (TAILLE_GRILLE_X * TAILLE_CUBE_ROUTE)/2, posYref + (TAILLE_GRILLE_Y * TAILLE_CUBE_ROUTE)/2, posZref + (TAILLE_GRILLE_Z * TAILLE_CUBE_ROUTE)/2,
-				 0F, 1F, 0F);
-		
 		p.pushMatrix();
 			p.translate(posXref + (TAILLE_GRILLE_X * TAILLE_CUBE_ROUTE)/2, posYref + (TAILLE_GRILLE_Y * TAILLE_CUBE_ROUTE)/2, (TAILLE_GRILLE_Z * TAILLE_CUBE_ROUTE)/2);
 			p.rotateX(PApplet.radians(rotX + 43));

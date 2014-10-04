@@ -5,6 +5,13 @@ public class Couleur {
 	private int luminosité;
 	private int transparence;
 	
+	public Couleur(int teinte) {
+		this.teinte = teinte;
+		this.saturation = 255;
+		this.luminosité = 255;
+		this.transparence = 255;
+	}
+	
 	public Couleur(int teinte, int saturation, int luminosité, int transparence) {
 		this.teinte = teinte;
 		this.saturation = saturation;

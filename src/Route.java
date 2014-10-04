@@ -47,17 +47,13 @@ public class Route extends Composant implements Comparable<Object>{
 			return -1;
 		else{
 			if(alignement == "N-S" && route.getAlignement() == "N-S"){
-				if(posY1 < route.getPosY1())
+				if(posX1 < route.getPosX1())
 					return -1;
-				else if(posY1 == route.getPosY1())
-					return 0;
 				else
 					return 1;
 			} else {
-				if(posX1 < route.getPosX1())
+				if(posY1 < route.getPosY1())
 					return -1;
-				else if(posX1 == route.getPosX1())
-					return 0;
 				else
 					return 1;
 			}

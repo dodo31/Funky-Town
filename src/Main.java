@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import processing.core.*;
 import processing.event.MouseEvent;
 
@@ -17,9 +19,19 @@ public class Main extends PApplet{
 	private static boolean affichageCubes = false;
 	private static char touchePrecedente;
 	
+	public static ArrayList<Couleur> couleursPredefinies;
+	
 	public void setup(){		
 		size(TAILLE_FENETRE_X, TAILLE_FENETRE_Y, P3D);
 		colorMode(HSB);
+
+		couleursPredefinies = new ArrayList<Couleur>();
+		couleursPredefinies.add(new Couleur(150));
+		couleursPredefinies.add(new Couleur(119));
+		couleursPredefinies.add(new Couleur(53));
+		couleursPredefinies.add(new Couleur(22));
+		couleursPredefinies.add(new Couleur(195));
+		couleursPredefinies.add(new Couleur(236));
 
 		Grille.setPapplet(this);
 		
@@ -39,6 +51,8 @@ public class Main extends PApplet{
 		
 		Grille.gererRotation();
 		Grille.gererZoom();
+		
+		Grille.gérerEclairageEtCamera();
 		
 		if(affichageContour)
 			Grille.afficherContour();
